@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ru" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VBE Химия: 5 Интерактивных Практикумов (Соли)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .bubble-anim {
+            animation: rise 1.2s infinite ease-in;
+        }
+        @keyframes rise {
+            0% { transform: translateY(0) scale(0.8); opacity: 1; }
+            100% { transform: translateY(-35px) scale(1.3); opacity: 0; }
+        }
+
+        .ppt-anim {
+            animation: fall 0.8s forwards ease-out;
+        }
+        @keyframes fall {
+            0% { opacity: 0; transform: translateY(-15px); }
+            100% { opacity: 0.95; transform: translateY(0); }
+        }
+
+        .heat-glow {
+            animation: glow 1s infinite alternate ease-in-out;
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.4); }
+            100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.9); }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40 px-4 py-3 sm:px-8">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-600/40 flex items-center justify-center font-mono font-bold text-emerald-400 text-lg">
+                    VBE
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-slate-100">
+                        Химия: 5 Экспертных Практикумов VBE (Соли)
+                    </h1>
+                    <p class="text-xs text-slate-400">Интерактивный тренажёр повышенной сложности</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-mono">
+                    <span class="text-slate-400">Счёт:</span>
+                    <span id="global-score" class="text-emerald-400 font-bold">0 / 100 баллов</span>
+                </div>
+                <button onclick="toggleModal('ref-modal')" class="px-3 py-1.5 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 transition-colors">
+                    📖 Справочник VBE
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+
+        <!-- Navigation Tabs -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 border-b border-slate-800 pb-4">
+            <button onclick="setTab('ex1')" id="tab-ex1" class="tab-btn px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-center transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-600/20">
+                1. Лабиринт LT
+            </button>
+            <button onclick="setTab('ex2')" id="tab-ex2" class="tab-btn px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-center transition-all bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700">
+                2. Детектив Na
+            </button>
+            <button onclick="setTab('ex3')" id="tab-ex3" class="tab-btn px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-center transition-all bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700">
+                3. Цепочка Cu-Zn
+            </button>
+            <button onclick="setTab('ex4')" id="tab-ex4" class="tab-btn px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-center transition-all bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700">
+                4. Разложение солей
+            </button>
+            <button onclick="setTab('ex5')" id="tab-ex5" class="tab-btn px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-center transition-all bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700">
+                5. Эксперт-Лаборатория
+            </button>
+        </div>
+
+        <!-- EXERCISE 1: NOMENKLATŪROS LABIRINTAS -->
+        <section id="sec-ex1" class="space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+                    <div>
+                        <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Упражнение 1</span>
+                        <h2 class="text-xl font-bold text-slate-100">«Лабиринт номенклатуры VBE» (Nomenklatūros labirintas)</h2>
+                    </div>
+                    <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg font-mono">20 баллов</span>
+                </div>
+
+                <p class="text-sm text-slate-300 mb-6">
+                    Сопоставьте формулу соли с её официальным правильным литовским государственным названием (VBE). Найдите парные варианты и укажите <strong>2 ЛИШНИХ названия</strong>, оставшиеся без пары!
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-mono uppercase text-slate-400 font-bold">Формулы солей:</h3>
+                        <div id="ex1-formulas" class="space-y-2"></div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-mono uppercase text-slate-400 font-bold">Официальные названия (VBE Pavadinimai):</h3>
+                        <div id="ex1-names" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 mb-6 space-y-3">
+                    <label class="block text-xs font-mono text-emerald-400 font-bold uppercase">
+                        🔍 Укажите ДВА ЛИШНИХ названия (дистракторы):
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <select id="ex1-extra-1" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-emerald-500">
+                            <option value="">-- Лишнее название №1 --</option>
+                        </select>
+                        <select id="ex1-extra-2" class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-emerald-500">
+                            <option value="">-- Лишнее название №2 --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="ex1-feedback" class="hidden p-4 rounded-xl border text-sm font-mono mb-4"></div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button onclick="resetEx1()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-sm hover:bg-slate-700 transition">Сбросить</button>
+                    <button onclick="checkEx1()" class="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white text-sm transition shadow-lg shadow-emerald-600/20">Проверить номенклатуру</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXERCISE 2: DETECTIVE "SODIUM IN SOLUTION" -->
+        <section id="sec-ex2" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+                    <div>
+                        <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Упражнение 2</span>
+                        <h2 class="text-xl font-bold text-slate-100">Детектив «Ловушка VBE: Натрий и активные металлы в растворах солей»</h2>
+                    </div>
+                    <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg font-mono">20 баллов</span>
+                </div>
+
+                <div class="bg-amber-950/40 border border-amber-800/60 rounded-xl p-4 mb-6 font-mono text-xs text-amber-200">
+                    <strong>⚠️ Сценарий классической ошибки в задании VBE:</strong><br>
+                    Ученик решает задачу VBE и записывает реакцию вытеснения:<br>
+                    <div class="text-center text-sm sm:text-base my-3 text-white font-bold bg-slate-950 py-2 rounded-lg border border-amber-800/40">
+                        2Na (s) + ZnCl<sub>2</sub> (aq) → 2NaCl (aq) + Zn (s)
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <label class="block text-sm font-semibold text-slate-200">
+                            1. Прав ли ученик? В чём фундаментальная ошибка химизма?
+                        </label>
+                        <div class="space-y-2 text-xs font-mono">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                                <input type="radio" name="ex2-q1" value="wrong_water" class="accent-emerald-500">
+                                <span>Неправ! Щёлочные металлы в растворе мгновенно реагируют с растворителем (H<sub>2</sub>O), а не вытесняют Zn.</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                                <input type="radio" name="ex2-q1" value="correct" class="accent-emerald-500">
+                                <span>Прав! Натрий стоящий левее цинка в электрохимическом ряду, мгновенно вытеснит чистый цинк.</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                                <input type="radio" name="ex2-q1" value="wrong_passivation" class="accent-emerald-500">
+                                <span>Неправ! Натрий пассивируется ионами хлора Cl<sup>-</sup> и вовсе не вступает в реакцию.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <label class="block text-sm font-semibold text-slate-200">
+                            2. Что конкретно произойдет, если бросить избыток Na в раствор ZnCl<sub>2</sub>?
+                        </label>
+                        <div class="space-y-2 text-xs font-mono">
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                                <input type="radio" name="ex2-q2" value="complex_dissolve" class="accent-emerald-500">
+                                <span>Сначала выпадет белый осадок Zn(OH)<sub>2</sub>↓ с выделением H<sub>2</sub>↑, а при избытке Na осадок растворится до Na<sub>2</sub>[Zn(OH)<sub>4</sub>].</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                                <input type="radio" name="ex2-q2" value="zinc_ppt" class="accent-emerald-500">
+                                <span>Выпадет ровный слой кристаллического цинка на поверхности пробирки.</span>
+                            </label>
+                            <label class="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 cursor-pointer border border-slate-800">
+                                <input type="radio" name="ex2-q2" value="gas_chlorine" class="accent-emerald-500">
+                                <span>Выделится ядовитый газ хлор Cl<sub>2</sub>↑ и выпадет осадок оксида натрия Na<sub>2</sub>O.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <label class="block text-sm font-semibold text-slate-200">
+                            3. Выберите правильное ионно-молекулярное описание взаимодействия с ИЗБЫТКОМ натрия:
+                        </label>
+                        <select id="ex2-q3-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-emerald-500">
+                            <option value="">-- Выберите правильную последовательность процессов --</option>
+                            <option value="correct">1) 2Na + 2H₂O → 2NaOH + H₂↑ ; 2) Zn²⁺ + 4OH⁻ → [Zn(OH)₄]²⁻</option>
+                            <option value="direct">1) 2Na + Zn²⁺ → 2Na⁺ + Zn↓</option>
+                            <option value="hydrolysis">1) Na + H₂O → NaOH + H₂ ; 2) ZnCl₂ + H₂O → ZnOHCl + HCl</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="ex2-feedback" class="hidden p-4 rounded-xl border text-sm font-mono my-4"></div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button onclick="checkEx2()" class="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white text-sm transition shadow-lg shadow-emerald-600/20">Проверить расследование</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXERCISE 3: ADVANCED SYNTHESIS CHAIN -->
+        <section id="sec-ex3" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+                    <div>
+                        <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Упражнение 3</span>
+                        <h2 class="text-xl font-bold text-slate-100">«Многостадийный синтез и амфотерность солей»</h2>
+                    </div>
+                    <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg font-mono">20 баллов</span>
+                </div>
+
+                <p class="text-sm text-slate-300 mb-6">
+                    Вам предложена 5-стадийная химическая цепочка превращений. Определите формулы веществ <strong>A, B, C, D</strong>, условия их образования и правильные стехиометрические коэффициенты.
+                </p>
+
+                <!-- Dynamic Chain Graphical Visualizer -->
+                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 mb-6 font-mono text-xs sm:text-sm space-y-4">
+                    <div class="flex items-center gap-2 flex-wrap text-emerald-300">
+                        <span class="text-slate-400 font-bold">1)</span>
+                        <span>Cu(NO<sub>3</sub>)<sub>2</sub> + 2NaOH (нед) → </span>
+                        <span id="chain-a" class="px-3 py-1 bg-slate-900 border border-dashed border-emerald-500 text-emerald-400 font-bold rounded-lg">[ A ]</span>
+                        <span>↓ + 2NaNO<sub>3</sub></span>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap text-cyan-300">
+                        <span class="text-slate-400 font-bold">2)</span>
+                        <span id="chain-a-ref">[ A ]</span>
+                        <span> + 4NH<sub>3</sub> (водн., избыток) → </span>
+                        <span id="chain-b" class="px-3 py-1 bg-slate-900 border border-dashed border-cyan-500 text-cyan-400 font-bold rounded-lg">[ B ]</span>
+                        <span> (раствор ярко-синего цвета)</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap text-purple-300">
+                        <span class="text-slate-400 font-bold">3)</span>
+                        <span>Zn + 2HCl → </span>
+                        <span id="chain-c" class="px-3 py-1 bg-slate-900 border border-dashed border-purple-500 text-purple-400 font-bold rounded-lg">[ C ]</span>
+                        <span> + H<sub>2</sub>↑</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap text-amber-300">
+                        <span class="text-slate-400 font-bold">4)</span>
+                        <span id="chain-c-ref">[ C ]</span>
+                        <span> + 2NaOH (нед) → </span>
+                        <span id="chain-d" class="px-3 py-1 bg-slate-900 border border-dashed border-amber-500 text-amber-400 font-bold rounded-lg">[ D ]</span>
+                        <span>↓ + 2NaCl</span>
+                    </div>
+
+                    <div class="flex items-center gap-2 flex-wrap text-pink-300">
+                        <span class="text-slate-400 font-bold">5)</span>
+                        <span id="chain-d-ref">[ D ]</span>
+                        <span> + 2NaOH (изб) → </span>
+                        <span id="chain-e" class="px-3 py-1 bg-slate-900 border border-dashed border-pink-500 text-pink-400 font-bold rounded-lg">[ E ]</span>
+                        <span> (прозрачный комплекс)</span>
+                    </div>
+                </div>
+
+                <!-- Selectors for Steps -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <label class="block text-xs font-mono font-bold text-emerald-400">Вещество A (Голубой осадок):</label>
+                        <select id="ex3-a" onchange="updateEx3Visuals()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-slate-200">
+                            <option value="">-- Выберите A --</option>
+                            <option value="Cu(OH)2">Cu(OH)₂ (гидроксид меди(II))</option>
+                            <option value="CuO">CuO (оксид меди(II))</option>
+                            <option value="Cu2O">Cu₂O (оксид меди(I))</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <label class="block text-xs font-mono font-bold text-cyan-400">Вещество B (Аммиакат меди):</label>
+                        <select id="ex3-b" onchange="updateEx3Visuals()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-slate-200">
+                            <option value="">-- Выберите B --</option>
+                            <option value="[Cu(NH3)4](OH)2">[Cu(NH₃)₄](OH)₂ (гидроксид тетраамминмеди(II))</option>
+                            <option value="Cu(NO3)2">Cu(NO₃)₂</option>
+                            <option value="[Cu(NH3)2]OH">[Cu(NH₃)₂]OH</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <label class="block text-xs font-mono font-bold text-purple-400">Вещество C (Соль цинка):</label>
+                        <select id="ex3-c" onchange="updateEx3Visuals()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-slate-200">
+                            <option value="">-- Выберите C --</option>
+                            <option value="ZnCl2">ZnCl₂ (хлорид цинка)</option>
+                            <option value="ZnSO4">ZnSO₄ (сульфат цинка)</option>
+                            <option value="Zn(ClO3)2">Zn(ClO₃)₂</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <label class="block text-xs font-mono font-bold text-amber-400">Вещество D (Белый осадок):</label>
+                        <select id="ex3-d" onchange="updateEx3Visuals()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-slate-200">
+                            <option value="">-- Выберите D --</option>
+                            <option value="Zn(OH)2">Zn(OH)₂ (гидроксид цинка)</option>
+                            <option value="ZnO">ZnO (оксид цинка)</option>
+                            <option value="Na2ZnO2">Na₂ZnO₂ (цинкат натрия)</option>
+                        </select>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 md:col-span-2 lg:col-span-2">
+                        <label class="block text-xs font-mono font-bold text-pink-400">Вещество E (Растворимый гидроксокомплекс):</label>
+                        <select id="ex3-e" onchange="updateEx3Visuals()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs font-mono text-slate-200">
+                            <option value="">-- Выберите E --</option>
+                            <option value="Na2[Zn(OH)4]">Na₂[Zn(OH)₄] (тетрагидроксицинкат натрия)</option>
+                            <option value="NaZnO2">NaZnO₂ (метацинкат натрия)</option>
+                            <option value="Zn(OH)2">Zn(OH)₂</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="ex3-feedback" class="hidden p-4 rounded-xl border text-sm font-mono mb-4"></div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button onclick="checkEx3()" class="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white text-sm transition shadow-lg shadow-emerald-600/20">Проверить цепочку синтеза</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXERCISE 4: THERMAL DECOMPOSITION MATRIX -->
+        <section id="sec-ex4" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+                    <div>
+                        <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Упражнение 4</span>
+                        <h2 class="text-xl font-bold text-slate-100">«Матрица термического разложения солей VBE»</h2>
+                    </div>
+                    <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg font-mono">20 баллов</span>
+                </div>
+
+                <p class="text-sm text-slate-300 mb-6">
+                    Определите характер разложения при нагревании (прокаливании) для <strong>8 различных солей</strong>. Распределите их по типам газообразных и твёрдых продуктов реакции:
+                </p>
+
+                <!-- Salt Cards Grid -->
+                <div id="ex4-salts-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <!-- Populated dynamically by JavaScript -->
+                </div>
+
+                <div id="ex4-feedback" class="hidden p-4 rounded-xl border text-sm font-mono my-4"></div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button onclick="checkEx4()" class="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white text-sm transition shadow-lg shadow-emerald-600/20">Проверить разложение солей</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXERCISE 5: ADVANCED ANALYTICAL VIRTUAL LAB -->
+        <section id="sec-ex5" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+                    <div>
+                        <span class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-wider">Упражнение 5</span>
+                        <h2 class="text-xl font-bold text-slate-100">«Виртуальная экспресс-лаборатория (6 неизвестных солей)»</h2>
+                    </div>
+                    <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-lg font-mono">20 баллов</span>
+                </div>
+
+                <p class="text-sm text-slate-300 mb-4">
+                    В 6 занумерованных пробирках находятся растворы 6 солей: <strong>Na<sub>2</sub>CO<sub>3</sub>, NH<sub>4</sub>Cl, Na<sub>2</sub>SO<sub>4</sub>, FeCl<sub>3</sub>, AgNO<sub>3</sub>, BaCl<sub>2</sub></strong>.
+                    Используйте реактивы, следите за выпадением осадков, выделением газов и изменениями цвета, а затем установите шифр каждой пробирки!
+                </p>
+
+                <!-- Virtual Lab Workbench -->
+                <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800 mb-6">
+                    <h3 class="text-xs font-mono font-bold text-slate-400 uppercase mb-6 text-center">🧪 Виртуальный лабораторный штатив</h3>
+                    
+                    <div id="tubes-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+                        <!-- 6 Test Tubes inserted dynamically -->
+                    </div>
+
+                    <!-- Reagent Control Shelf -->
+                    <div class="space-y-3 border-t border-slate-800 pt-4">
+                        <span class="block text-xs font-mono text-slate-400 font-bold uppercase text-center">Добавьте реагент во ВСЕ пробирки для параллельного анализа:</span>
+                        <div class="flex flex-wrap justify-center gap-2">
+                            <button onclick="applyLabReagent('HCl')" class="px-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 font-mono text-xs font-bold text-white transition">
+                                🧪 HCl (соляная кислота)
+                            </button>
+                            <button onclick="applyLabReagent('NaOH')" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 font-mono text-xs font-bold text-white transition">
+                                🧪 NaOH (щёлочь)
+                            </button>
+                            <button onclick="applyLabReagent('NaOH_Heat')" class="px-3 py-2 rounded-xl bg-red-600 hover:bg-red-500 font-mono text-xs font-bold text-white transition heat-glow">
+                                🔥 NaOH + Нагревание (t°)
+                            </button>
+                            <button onclick="applyLabReagent('BaNO3')" class="px-3 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 font-mono text-xs font-bold text-white transition">
+                                🧪 Ba(NO<sub>3</sub>)<sub>2</sub>
+                            </button>
+                            <button onclick="applyLabReagent('AgNO3')" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-mono text-xs font-bold text-white transition">
+                                🧪 AgNO<sub>3</sub>
+                            </button>
+                            <button onclick="resetLabEngine()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 font-mono text-xs text-slate-300 transition">
+                                🔄 Очистить пробирки
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deduction Form -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-4 mb-6">
+                    <h3 class="text-xs font-mono font-bold text-emerald-400 uppercase">📋 Экспертное заключение лабораторного анализа:</h3>
+                    
+                    <div id="deduction-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 font-mono text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <div id="ex5-feedback" class="hidden p-4 rounded-xl border text-sm font-mono mb-4"></div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button onclick="checkEx5()" class="px-6 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white text-sm transition shadow-lg shadow-emerald-600/20">Сдать протокол экспертизы</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: Reference Sheet -->
+    <div id="ref-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900 sticky top-0">
+                <h3 class="font-bold text-slate-100 font-mono text-base">📖 Справочник экзаменационных таблиц VBE</h3>
+                <button onclick="toggleModal('ref-modal')" class="text-slate-400 hover:text-slate-100 font-mono text-xl px-2">✕</button>
+            </div>
+            
+            <div class="p-6 overflow-auto flex-1 font-mono text-xs space-y-6">
+                <div>
+                    <h4 class="font-bold text-emerald-400 text-sm mb-2">1. Электрохимический ряд напряжений металлов (Beketovo eilė):</h4>
+                    <p class="p-3 bg-slate-950 border border-slate-800 rounded-xl text-center text-slate-200 text-xs sm:text-sm">
+                        Li, K, Ba, Ca, <strong>Na</strong>, Mg, Al, Zn, Fe, Ni, Sn, Pb, <strong>(H)</strong>, Cu, Hg, <strong>Ag</strong>, Pt, Au
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-amber-400 text-sm mb-2">2. Таблица разложения нитратов и солей:</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                            <span class="text-amber-400 font-bold">Na, K (Щелочные)</span>
+                            <p class="mt-1 text-slate-300">2MNO<sub>3</sub> → 2MNO<sub>2</sub> + O<sub>2</sub>↑</p>
+                            <p class="text-[10px] text-slate-500 mt-1">*Исключение: LiNO<sub>3</sub> дает Li<sub>2</sub>O + NO<sub>2</sub> + O<sub>2</sub></p>
+                        </div>
+                        <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                            <span class="text-cyan-400 font-bold">От Mg до Cu</span>
+                            <p class="mt-1 text-slate-300">2M(NO<sub>3</sub>)<sub>2</sub> → 2MO + 4NO<sub>2</sub>↑ + O<sub>2</sub>↑</p>
+                        </div>
+                        <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                            <span class="text-purple-400 font-bold">Ag, Au (Благородные)</span>
+                            <p class="mt-1 text-slate-300">2MNO<sub>3</sub> → 2M + 2NO<sub>2</sub>↑ + O<sub>2</sub>↑</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-cyan-400 text-sm mb-2">3. Качественные реакции на катионы и анионы:</h4>
+                    <ul class="space-y-1.5 text-slate-300">
+                        <li>• <strong class="text-emerald-400">CO<sub>3</sub><sup>2-</sup> + H<sup>+</sup>:</strong> Бесцветный газ CO<sub>2</sub>↑ (вскипание).</li>
+                        <li>• <strong class="text-emerald-400">SO<sub>4</sub><sup>2-</sup> + Ba<sup>2+</sup>:</strong> Белый осадок BaSO<sub>4</sub>↓ (нерастворим в HNO<sub>3</sub> и HCl).</li>
+                        <li>• <strong class="text-emerald-400">Cl<sup>-</sup> + Ag<sup>+</sup>:</strong> Белый творогообразный осадок AgCl↓ (темнеет на свету).</li>
+                        <li>• <strong class="text-emerald-400">Fe<sup>3+</sup> + OH<sup>-</sup>:</strong> Красно-бурый гелеобразный осадок Fe(OH)<sub>3</sub>↓.</li>
+                        <li>• <strong class="text-emerald-400">NH<sub>4</sub><sup>+</sup> + OH<sup>-</sup> + t°:</strong> Резкий запах аммиака NH<sub>3</sub>↑ (влажная красная лакмусовая бумага синеет).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic Script -->
+    <script>
+        // Global Scores State
+        let scores = { ex1: 0, ex2: 0, ex3: 0, ex4: 0, ex5: 0 };
+
+        // -------------------------------------------------------------
+        // EXERCISE 1 DATA & LOGIC
+        // -------------------------------------------------------------
+        const ex1Pairs = [
+            { id: 1, formula: "NaH<sub>2</sub>PO<sub>4</sub>", correctCode: "B", name: "Natrio dvivandenilio fosfatas" },
+            { id: 2, formula: "K[Al(OH)<sub>4</sub>]", correctCode: "G", name: "Kalio tetrahidroksialiuminatas" },
+            { id: 3, formula: "Cu<sub>2</sub>(OH)<sub>2</sub>CO<sub>3</sub>", correctCode: "E", name: "Vario(II) hidroksikarbonatas" },
+            { id: 4, formula: "KAl(SO<sub>4</sub>)<sub>2</sub>", correctCode: "D", name: "Kalio aliuminio sulfatas" },
+            { id: 5, formula: "FeCl<sub>3</sub>", correctCode: "A", name: "Geležies(III) chloridas" },
+            { id: 6, formula: "Na<sub>2</sub>HPO<sub>4</sub>", correctCode: "H", name: "Natrio vandenilio fosfatas" }
+        ];
+
+        const ex1AllNames = [
+            { code: "A", text: "Geležies(III) chloridas" },
+            { code: "B", text: "Natrio dvivandenilio fosfatas" },
+            { code: "C", text: "Natrio vandenilio karbonatas" }, // Distractor 1 (NaHCO3)
+            { code: "D", text: "Kalio aliuminio sulfatas" },
+            { code: "E", text: "Vario(II) hidroksikarbonatas" },
+            { code: "F", text: "Geležies(II) chloridas" },        // Distractor 2 (FeCl2)
+            { code: "G", text: "Kalio tetrahidroksialiuminatas" },
+            { code: "H", text: "Natrio vandenilio fosfatas" }
+        ];
+
+        let ex1UserSelections = {};
+
+        function initEx1() {
+            const formContainer = document.getElementById('ex1-formulas');
+            const nameContainer = document.getElementById('ex1-names');
+            const extra1Select = document.getElementById('ex1-extra-1');
+            const extra2Select = document.getElementById('ex1-extra-2');
+
+            if (!formContainer || !nameContainer) return;
+
+            formContainer.innerHTML = ex1Pairs.map(p => `
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between font-mono text-xs sm:text-sm">
+                    <span class="text-emerald-400 font-bold">${p.formula}</span>
+                    <select onchange="ex1UserSelections[${p.id}] = this.value" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-200">
+                        <option value="">-- Выберите название --</option>
+                        ${ex1AllNames.map(n => `<option value="${n.code}">${n.code}) ${n.text}</option>`).join('')}
+                    </select>
+                </div>
+            `).join('');
+
+            nameContainer.innerHTML = `
+                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-mono text-slate-300">
+                    ${ex1AllNames.map(n => `<p><strong class="text-amber-400">${n.code})</strong> ${n.text}</p>`).join('')}
+                </div>
+            `;
+
+            const optionsHtml = `<option value="">-- Выберите лишнее название --</option>` + 
+                ex1AllNames.map(n => `<option value="${n.code}">${n.code}) ${n.text}</option>`).join('');
+            
+            if (extra1Select) extra1Select.innerHTML = optionsHtml;
+            if (extra2Select) extra2Select.innerHTML = optionsHtml;
+        }
+
+        function checkEx1() {
+            let correctMatches = 0;
+            ex1Pairs.forEach(p => {
+                if (ex1UserSelections[p.id] === p.correctCode) correctMatches++;
+            });
+
+            const extra1 = document.getElementById('ex1-extra-1').value;
+            const extra2 = document.getElementById('ex1-extra-2').value;
+
+            const extraCorrect = (
+                (extra1 === "C" && extra2 === "F") || 
+                (extra1 === "F" && extra2 === "C")
+            );
+
+            const feedback = document.getElementById('ex1-feedback');
+            feedback.classList.remove('hidden');
+
+            if (correctMatches === 6 && extraCorrect) {
+                scores.ex1 = 20;
+                feedback.className = "p-4 rounded-xl border text-sm font-mono mb-4 bg-emerald-950/60 border-emerald-800 text-emerald-300";
+                feedback.innerHTML = `<strong>🎉 Превосходно! (20/20 баллов)</strong><br>Все сопоставления номенклатуры VBE верны! Лишние дистракторы: <strong>C (Natrio vandenilio karbonatas - NaHCO₃)</strong> и <strong>F (Geležies(II) chloridas - FeCl₂)</strong>.`;
+            } else {
+                scores.ex1 = Math.round((correctMatches / 6) * 14) + (extraCorrect ? 6 : 0);
+                feedback.className = "p-4 rounded-xl border text-sm font-mono mb-4 bg-amber-950/60 border-amber-800 text-amber-300";
+                feedback.innerHTML = `<strong>⚠️ Верно сопоставлено: ${correctMatches} из 6. Лишние названия: ${extraCorrect ? 'Верно' : 'Есть ошибки'}</strong><br>Правильные парные совпадения: 1—B, 2—G, 3—E, 4—D, 5—A, 6—H. Лишние дистракторы — C и F.`;
+            }
+            updateGlobalScore();
+        }
+
+        function resetEx1() {
+            ex1UserSelections = {};
+            initEx1();
+            const feedback = document.getElementById('ex1-feedback');
+            if (feedback) feedback.classList.add('hidden');
+        }
+
+        // -------------------------------------------------------------
+        // EXERCISE 2 LOGIC
+        // -------------------------------------------------------------
+        function checkEx2() {
+            const q1 = document.querySelector('input[name="ex2-q1"]:checked')?.value;
+            const q2 = document.querySelector('input[name="ex2-q2"]:checked')?.value;
+            const q3 = document.getElementById('ex2-q3-select').value;
+
+            const feedback = document.getElementById('ex2-feedback');
+            feedback.classList.remove('hidden');
+
+            if (q1 === "wrong_water" && q2 === "complex_dissolve" && q3 === "correct") {
+                scores.ex2 = 20;
+                feedback.className = "p-4 rounded-xl border text-sm font-mono my-4 bg-emerald-950/60 border-emerald-800 text-emerald-300";
+                feedback.innerHTML = `<strong>🎉 Замечательно! (20/20 баллов)</strong><br>Вы отлично знаете нюансы VBE! Активные металлы I-A и II-A группы не вытесняют другие металлы из растворов солей, а реагируют с водой с образованием гидроксидов, а амфотерные гидроксиды (как Zn(OH)₂) растворяются в избытке щёлочи до комплексных тетрагидроксицинкатов!`;
+            } else {
+                scores.ex2 = 5;
+                feedback.className = "p-4 rounded-xl border text-sm font-mono my-4 bg-amber-950/60 border-amber-800 text-amber-300";
+                feedback.innerHTML = `<strong>⚠️ Ошибка в анализе химизма!</strong><br>Правильная цепочка рассуждений:<br>1. Na реагирует с H<sub>2</sub>O, а не с ZnCl<sub>2</sub> напрямую.<br>2. При недостатке щёлочи выпадет Zn(OH)<sub>2</sub>↓, а при избытке Na (и NaOH) он растворится с образованием комплексов Na<sub>2</sub>[Zn(OH)<sub>4</sub>].`;
+            }
+            updateGlobalScore();
+        }
+
+        // -------------------------------------------------------------
+        // EXERCISE 3 LOGIC
+        // -------------------------------------------------------------
+        function updateEx3Visuals() {
+            const a = document.getElementById('ex3-a').value || 'A';
+            const b = document.getElementById('ex3-b').value || 'B';
+            const c = document.getElementById('ex3-c').value || 'C';
+            const d = document.getElementById('ex3-d').value || 'D';
+            const e = document.getElementById('ex3-e').value || 'E';
+
+            document.getElementById('chain-a').innerText = a;
+            document.getElementById('chain-a-ref').innerText = a;
+            document.getElementById('chain-b').innerText = b;
+            document.getElementById('chain-c').innerText = c;
+            document.getElementById('chain-c-ref').innerText = c;
+            document.getElementById('chain-d').innerText = d;
+            document.getElementById('chain-d-ref').innerText = d;
+            document.getElementById('chain-e').innerText = e;
+        }
+
+        function checkEx3() {
+            const a = document.getElementById('ex3-a').value;
+            const b = document.getElementById('ex3-b').value;
+            const c = document.getElementById('ex3-c').value;
+            const d = document.getElementById('ex3-d').value;
+            const e = document.getElementById('ex3-e').value;
+
+            const feedback = document.getElementById('ex3-feedback');
+            feedback.classList.remove('hidden');
+
+            if (a === "Cu(OH)2" && b === "[Cu(NH3)4](OH)2" && c === "ZnCl2" && d === "Zn(OH)2" && e === "Na2[Zn(OH)4]") {
+                scores.ex3 = 20;
+                feedback.className = "p-4 rounded-xl border text-sm font-mono mb-4 bg-emerald-950/60 border-emerald-800 text-emerald-300";
+                feedback.innerHTML = `<strong>🏆 Безупречно составленный синтез! (20/20 баллов)</strong><br>
+                • A = Cu(OH)<sub>2</sub> (голубой осадок)<br>
+                • B = [Cu(NH<sub>3</sub>)<sub>4</sub>](OH)<sub>2</sub> (васильково-синий комплекс)<br>
+                • C = ZnCl<sub>2</sub> (соль цинка)<br>
+                • D = Zn(OH)<sub>2</sub> (амфотерный гидроксид)<br>
+                • E = Na<sub>2</sub>[Zn(OH)<sub>4</sub>] (растворимый тетрагидроксицинкат)`;
+            } else {
+                scores.ex3 = 5;
+                feedback.className = "p-4 rounded-xl border text-sm font-mono mb-4 bg-amber-950/60 border-amber-800 text-amber-300";
+                feedback.innerHTML = `<strong>⚠️ В синтетической цепочке есть ошибки!</strong><br>Вспомните комплексообразование: Cu(OH)<sub>2</sub> с водным аммиаком образует ярко-синий раствор аммиаката [Cu(NH<sub>3</sub>)<sub>4</sub>](OH)<sub>2</sub>, а Zn(OH)<sub>2</sub> в избытке NaOH образует Na<sub>2</sub>[Zn(OH)<sub>4</sub>].`;
+            }
+            updateGlobalScore();
+        }
+
+        // -------------------------------------------------------------
+        // EXERCISE 4 DATA & LOGIC
+        // -------------------------------------------------------------
+        const ex4SaltsData = [
+            { id: "kno3", formula: "KNO<sub>3</sub>", correctType: "1", note: "Нитрат K → KNO₂ + O₂" },
+            { id: "cuno3", formula: "Cu(NO<sub>3</sub>)<sub>2</sub>", correctType: "2", note: "Нитрат Cu → CuO + NO₂ + O₂" },
+            { id: "agno3", formula: "AgNO<sub>3</sub>", correctType: "3", note: "Нитрат Ag → Ag + NO₂ + O₂" },
+            { id: "mgno3", formula: "Mg(NO<sub>3</sub>)<sub>2</sub>", correctType: "2", note: "Нитрат Mg → MgO + NO₂ + O₂" },
+            { id: "lino3", formula: "LiNO<sub>3</sub>", correctType: "2", note: "Исключение Li → Li₂O + NO₂ + O₂" },
+            { id: "nh4no3", formula: "NH<sub>4</sub>NO<sub>3</sub>", correctType: "4", note: "Разложение → N₂O↑ + 2H₂O" },
+            { id: "caco3", formula: "CaCO<sub>3</sub>", correctType: "5", note: "Карбонат → CaO + CO₂↑" },
+            { id: "nh4hco3", formula: "NH<sub>4</sub>HCO<sub>3</sub>", correctType: "6", note: "Разложение → NH₃↑ + CO₂↑ + H₂O" }
+        ];
+
+        function initEx4() {
+            const grid = document.getElementById('ex4-salts-grid');
+            if (!grid) return;
+            grid.innerHTML = ex4SaltsData.map(s => `
+                <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center font-mono flex flex-col justify-between">
+                    <div>
+                        <span class="text-emerald-400 font-bold text-sm sm:text-base block mb-2">${s.formula}</span>
+                    </div>
+                    <select id="ex4-sel-${s.id}" class="w-full bg-slate-900 border border-slate-700 text-xs rounded-lg p-2 text-slate-200 focus:outline-none focus:border-emerald-500">
+                        <option value="">-- Продукты разложения --</option>
+                        <option value="1">Соль (нитрит) + O₂</option>
+                        <option value="2">Оксид + NO₂ + O₂</option>
+                        <option value="3">Чистый металл + NO₂ + O₂</option>
+                        <option value="4">Оксид азота(I) N₂O + H₂O</option>
+                        <option value="5">Оксид металла + CO₂</option>
+                        <option value="6">Газы NH₃ + CO₂ + H₂O</option>
+                    </select>
+                </div>
+            `).join('');
+        }
+
+        function checkEx4() {
+            let correctCount = 0;
+            ex4SaltsData.forEach(s => {
+                const sel = document.getElementById(`ex4-sel-${s.id}`);
+                if (sel && sel.value === s.correctType) correctCount++;
+            });
+
+            const feedback = document.getElementById('ex4-feedback');
+            feedback.classList.remove('hidden');
+
+            if (correctCount === 8) {
+                scores.ex4 = 20;
+                feedback.className = "p-4 rounded-xl border text-sm font-mono my-4 bg-emerald-950/60 border-emerald-800 text-emerald-300";
+                feedback.innerHTML = `<strong>🏆 Идеальный результат разложения солей! (20/20 баллов)</strong><br>Все 8 солей верно квалифицированы по продуктам прокаливания!`;
+            } else {
+                scores.ex4 = Math.round((correctCount / 8) * 20);
+                feedback.className = "p-4 rounded-xl border text-sm font-mono my-4 bg-amber-950/60 border-amber-800 text-amber-300";
+                feedback.innerHTML = `<strong>⚠️ Верно определено: ${correctCount} из 8 солей.</strong><br>Обратите особое внимание на исключение LiNO<sub>3</sub> (образует Li<sub>2</sub>O) и разложение солей аммония (NH<sub>4</sub>NO<sub>3</sub> → N<sub>2</sub>O + 2H<sub>2</sub>O).`;
+            }
+            updateGlobalScore();
+        }
+
+        // -------------------------------------------------------------
+        // EXERCISE 5 VIRTUAL LAB ENGINE
+        // -------------------------------------------------------------
+        const ex5SecretSalts = {
+            1: { code: "Na2CO3", name: "Na₂CO₃ (карбонат натрия)" },
+            2: { code: "NH4Cl", name: "NH₄Cl (хлорид аммония)" },
+            3: { code: "Na2SO4", name: "Na₂SO₄ (сульфат натрия)" },
+            4: { code: "FeCl3", name: "FeCl₃ (хлорид железа(III))" },
+            5: { code: "AgNO3", name: "AgNO₃ (нитрат серебра)" },
+            6: { code: "BaCl2", name: "BaCl₂ (хлорид бария)" }
+        };
+
+        function initEx5() {
+            const container = document.getElementById('tubes-container');
+            const deductionGrid = document.getElementById('deduction-grid');
+
+            if (!container || !deductionGrid) return;
+
+            let tubesHtml = '';
+            let deductionHtml = '';
+
+            for (let i = 1; i <= 6; i++) {
+                const initBg = (i === 4) ? "bg-amber-500/30" : "bg-cyan-500/20";
+                const initLabel = (i === 4) ? "Желтоватый" : "Прозрачный";
+
+                tubesHtml += `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-14 sm:w-16 h-36 bg-slate-900 border-2 border-slate-700 rounded-b-full relative overflow-hidden flex flex-col justify-end p-1">
+                            <div id="lab-fluid-${i}" class="w-full h-16 ${initBg} rounded-b-full relative transition-all duration-500 flex items-center justify-center">
+                                <div id="lab-effect-${i}" class="absolute inset-0 flex flex-col items-center justify-center p-1 text-center">
+                                    <span class="text-[9px] font-mono text-slate-400">${initLabel}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="font-mono font-bold text-xs text-slate-300">Пробирка №${i}</span>
+                    </div>
+                `;
+
+                deductionHtml += `
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-bold">Пробирка №${i}:</label>
+                        <select id="deduce-${i}" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200 text-xs">
+                            <option value="">-- Выберите соль --</option>
+                            <option value="Na2CO3">Na₂CO₃</option>
+                            <option value="NH4Cl">NH₄Cl</option>
+                            <option value="Na2SO4">Na₂SO₄</option>
+                            <option value="FeCl3">FeCl₃</option>
+                            <option value="AgNO3">AgNO₃</option>
+                            <option value="BaCl2">BaCl₂</option>
+                        </select>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = tubesHtml;
+            deductionGrid.innerHTML = deductionHtml;
+        }
+
+        function applyLabReagent(reagent) {
+            for (let i = 1; i <= 6; i++) {
+                const fluid = document.getElementById(`lab-fluid-${i}`);
+                const effect = document.getElementById(`lab-effect-${i}`);
+
+                if (!fluid || !effect) continue;
+
+                if (reagent === 'HCl') {
+                    if (i === 1) { // Na2CO3
+                        effect.innerHTML = `<span class="text-[10px] font-bold text-emerald-300 bubble-anim">🫧 CO₂↑</span>`;
+                        fluid.className = "w-full h-20 bg-emerald-500/30 rounded-b-full relative transition-all duration-500";
+                    } else if (i === 5) { // AgNO3
+                        effect.innerHTML = `<span class="text-[10px] font-bold text-slate-100 ppt-anim">⬜ AgCl↓</span>`;
+                        fluid.className = "w-full h-20 bg-slate-200/60 rounded-b-full relative transition-all duration-500";
+                    } else if (i === 4) { // FeCl3
+                        effect.innerHTML = `<span class="text-[9px] text-amber-300">Жёлтый</span>`;
+                        fluid.className = "w-full h-16 bg-amber-500/30 rounded-b-full relative transition-all duration-500";
+                    } else {
+                        effect.innerHTML = `<span class="text-[9px] text-slate-500">Без измен.</span>`;
+                    }
+                } else if (reagent === 'NaOH') {
+                    if (i === 4) { // FeCl3 -> Red-brown ppt Fe(OH)3
+                        effect.innerHTML = `<span class="text-[10px] font-bold text-amber-200 ppt-anim">🟤 Fe(OH)₃↓</span>`;
+                        fluid.className = "w-full h-20 bg-amber-900/80 rounded-b-full relative transition-all duration-500";
+                    } else if (i === 5) { // AgNO3 -> Ag2O brown ppt
+                        effect.innerHTML = `<span class="text-[10px] font-bold text-stone-300 ppt-anim">🟤 Ag₂O↓</span>`;
+                        fluid.className = "w-full h-20 bg-stone-800/80 rounded-b-full relative transition-all duration-500";
+                    } else {
+                        effect.innerHTML = `<span class="text-[9px] text-slate-500">Без измен.</span>`;
+                    }
+                } else if (reagent === 'NaOH_Heat') {
+                    if (i === 2) { // NH4Cl -> NH3 gas with smell & blue litmus
+                        effect.innerHTML = `<span class="text-[9px] font-bold text-blue-300 bubble-anim">💨 NH₃↑ (Лакмус 🟦)</span>`;
+                        fluid.className = "w-full h-20 bg-blue-500/30 rounded-b-full relative transition-all duration-500";
+                    } else if (i === 4) {
+                        effect.innerHTML = `<span class="text-[10px] font-bold text-amber-200 ppt-anim">🟤 Fe(OH)₃↓</span>`;
+                        fluid.className = "w-full h-20 bg-amber-900/80 rounded-b-full relative transition-all duration-500";
+                    } else {
+                        effect.innerHTML = `<span class="text-[9px] text-slate-500">Без измен.</span>`;
+                    }
+                } else if (reagent === 'BaNO3') {
+                    if (i === 1) { // Na2CO3
+                        effect.innerHTML = `<span class="text-[10px] font-bold text-slate-200 ppt-anim">⚪ BaCO₃↓</span>`;
+                        fluid.className = "w-full h-20 bg-slate-300/50 rounded-b-full relative transition-all duration-500";
+                    } else if (i === 3) { // Na2SO4
+                        effect.innerHTML = `<span class="text-[10px] font-bold text-white ppt-anim">⬜ BaSO₄↓</span>`;
+                        fluid.className = "w-full h-20 bg-slate-100/70 rounded-b-full relative transition-all duration-500";
+                    } else {
+                        effect.innerHTML = `<span class="text-[9px] text-slate-500">Без измен.</span>`;
+                    }
+                } else if (reagent === 'AgNO3') {
+                    if (i === 1) { // Na2CO3
+                        effect.innerHTML = `<span class="text-[10px] font-bold text-yellow-200 ppt-anim">🟡 Ag₂CO₃↓</span>`;
+                        fluid.className = "w-full h-20 bg-yellow-600/40 rounded-b-full relative transition-all duration-500";
+                    } else if (i === 2 || i === 4 || i === 6) { // NH4Cl, FeCl3, BaCl2 -> AgCl ppt
+                        effect.innerHTML = `<span class="text-[10px] font-bold text-slate-100 ppt-anim">⚪ AgCl↓</span>`;
+                        fluid.className = "w-full h-20 bg-slate-200/60 rounded-b-full relative transition-all duration-500";
+                    } else {
+                        effect.innerHTML = `<span class="text-[9px] text-slate-500">Без измен.</span>`;
+                    }
+                }
+            }
+        }
+
+        function resetLabEngine() {
+            for (let i = 1; i <= 6; i++) {
+                const fluid = document.getElementById(`lab-fluid-${i}`);
+                const effect = document.getElementById(`lab-effect-${i}`);
+                if (fluid && effect) {
+                    const initBg = (i === 4) ? "bg-amber-500/30" : "bg-cyan-500/20";
+                    const initLabel = (i === 4) ? "Желтоватый" : "Прозрачный";
+                    fluid.className = "w-full h-16 " + initBg + " rounded-b-full relative transition-all duration-500 flex items-center justify-center";
+                    effect.innerHTML = `<span class="text-[9px] font-mono text-slate-400">${initLabel}</span>`;
+                }
+            }
+        }
+
+        function checkEx5() {
+            let correctCount = 0;
+            for (let i = 1; i <= 6; i++) {
+                const sel = document.getElementById(`deduce-${i}`);
+                if (sel && sel.value === ex5SecretSalts[i].code) {
+                    correctCount++;
+                }
+            }
+
+            const feedback = document.getElementById('ex5-feedback');
+            feedback.classList.remove('hidden');
+
+            if (correctCount === 6) {
+                scores.ex5 = 20;
+                feedback.className = "p-4 rounded-xl border text-sm font-mono mb-4 bg-emerald-950/60 border-emerald-800 text-emerald-300";
+                feedback.innerHTML = `<strong>🏆 Отличный результат аналитической экспертизы! (20/20 баллов)</strong><br>Все 6 неизвестных солей идентифицированы безошибочно!`;
+            } else {
+                scores.ex5 = Math.round((correctCount / 6) * 20);
+                feedback.className = "p-4 rounded-xl border text-sm font-mono mb-4 bg-amber-950/60 border-amber-800 text-amber-300";
+                feedback.innerHTML = `<strong>⚠️ Верно расшифровано: ${correctCount} из 6 солей.</strong><br>Проверьте результаты реакции с HCl (выделение CO₂ указывает на Na₂CO₃), NaOH при нагревании (выделение NH₃ с синением лакмуса на NH₄Cl), Ba(NO₃)₂ (белый осадок BaSO₄) и AgNO₃.`;
+            }
+            updateGlobalScore();
+        }
+
+        // -------------------------------------------------------------
+        // HELPER UTILITIES
+        // -------------------------------------------------------------
+        function updateGlobalScore() {
+            const total = scores.ex1 + scores.ex2 + scores.ex3 + scores.ex4 + scores.ex5;
+            const scoreElem = document.getElementById('global-score');
+            if (scoreElem) {
+                scoreElem.innerText = `${total} / 100 баллов`;
+            }
+        }
+
+        function setTab(tabId) {
+            const sections = ['sec-ex1', 'sec-ex2', 'sec-ex3', 'sec-ex4', 'sec-ex5'];
+            sections.forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.classList.add('hidden');
+            });
+
+            const targetSec = document.getElementById(`sec-${tabId}`);
+            if (targetSec) targetSec.classList.remove('hidden');
+
+            const tabs = ['tab-ex1', 'tab-ex2', 'tab-ex3', 'tab-ex4', 'tab-ex5'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(t);
+                if (btn) {
+                    btn.className = "tab-btn px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-center transition-all bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700";
+                }
+            });
+
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn px-3 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-center transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-600/20";
+            }
+        }
+
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.toggle('hidden');
+            }
+        }
+
+        // Initialize application on DOM ready
+        window.addEventListener('DOMContentLoaded', () => {
+            initEx1();
+            initEx4();
+            initEx5();
+            updateGlobalScore();
+        });
+    </script>
+</body>
+</html>
